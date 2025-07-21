@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Route,Routes,Link } from 'react-router-dom'
+import { Route, Routes, Link } from 'react-router-dom'
 import './App.css'
 import Home from './pages/Home'
 import Cart from './components/Cart'
@@ -7,26 +7,51 @@ import CartPage from './pages/CartPage'
 import ProductDetails from './pages/ProductDetails'
 import ProductList from './components/ProductList'
 import ProductCart from './components/ProductCart'
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Settings from './pages/Settings';
+import TrackOrder from './pages/TrackOrder';
+import PlaceOrder from './pages/PlaceOrder';
+import Navbar from './components/Navbar';
+import Dresses from './pages/Dresses';
+import NewArrivals from './pages/NewArrivals';
+import Bestsellers from './pages/Bestsellers';
+import Wedding from './pages/Wedding';
+import Cocktail from './pages/Cocktail';
+import Summer from './pages/Summer';
+import Contact from './pages/Contact';
+import FAQ from './pages/FAQ';
+import Shipping from './pages/Shipping';
+import Returns from './pages/Returns';
+import SizeGuide from './pages/SizeGuide';
 import { useEffect } from 'react';
 
 
 function App() {
   const [cartItems,setCartItems] = useState([]);
+  const [showNotification, setShowNotification] = useState(false);
+
 
   const addToCart = (product) => {
     setCartItems((prevCart) => {
       const isProductInCart = prevCart.find((item) => item.id === product.id);
-
       if (isProductInCart) {
-        
-        return prevCart.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        );
+        // Do not increase quantity, just show notification
+        return prevCart;
       } else {
-      
         return [...prevCart, { ...product, quantity: 1 }];
       }
     });
+    setShowNotification(true);
+    setTimeout(() => setShowNotification(false), 2000);
+  };
+
+  const updateQuantity = (id, quantity) => {
+    setCartItems((prevCart) =>
+      prevCart.map((item) =>
+        item.id === id ? { ...item, quantity: Math.max(1, quantity) } : item
+      )
+    );
   };
 
 
@@ -49,22 +74,11 @@ useEffect(()=>{
 
   return (
     <div className="app-container">
+      {showNotification && (
+        <div className="cart-notification">Item added to cart!</div>
+      )}
       <header className="header">
-        <nav className="nav">
-          <div className="nav-logo">
-            <Link to="/">SPort HUb</Link>
-          </div>
-          <div className="nav-links">
-            <Link to="/" className="nav-link">Home</Link>
-            <Link to="/products" className="nav-link">Products</Link>
-            <Link to="/cart" className="nav-link cart-link">
-              Cart 
-              {cartItems.length > 0 && (
-                <span className="cart-badge">{cartItems.length}</span>
-              )}
-            </Link>
-          </div>
-        </nav>
+        <Navbar />
       </header>
       
       <main className="main-content">
@@ -72,16 +86,30 @@ useEffect(()=>{
           <Route path="/" element={<Home addToCart={addToCart} />} />
           <Route path="/products" element={<ProductList addToCart={addToCart} />} />
           <Route path="/product/:id" element={<ProductDetails addToCart={addToCart} />} />
-          <Route path="/cart" element={<CartPage cartItems={cartItems} removeFromCart={removeFromCart} />} />
+          <Route path="/cart" element={<CartPage cartItems={cartItems} removeFromCart={removeFromCart} updateQuantity={updateQuantity} />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/track-order" element={<TrackOrder />} />
+          <Route path="/place-order" element={<PlaceOrder />} />
+          <Route path="/dresses" element={<Dresses addToCart={addToCart} />} />
+          <Route path="/new-arrivals" element={<NewArrivals addToCart={addToCart} />} />
+          <Route path="/bestsellers" element={<Bestsellers addToCart={addToCart} />} />
+          <Route path="/wedding" element={<Wedding addToCart={addToCart} />} />
+          <Route path="/cocktail" element={<Cocktail addToCart={addToCart} />} />
+          <Route path="/summer" element={<Summer addToCart={addToCart} />} />
+          <Route path="/contact" element={<Contact />} />
+          <Route path="/faq" element={<FAQ />} />
+          <Route path="/shipping" element={<Shipping />} />
+          <Route path="/returns" element={<Returns />} />
+          <Route path="/size-guide" element={<SizeGuide />} />
         </Routes>
       </main>
       
      <footer className="footer">
   <div className="footer-container">
-    
     {/* Main Footer Sections */}
     <div className="footer-sections">
-      
       {/* About & Brand Info */}
       <div className="footer-section">
         <h3>Fashion Boutique</h3>
@@ -93,33 +121,30 @@ useEffect(()=>{
           <img src="/icons/klarna.png" alt="Klarna" />
         </div>
       </div>
-      
       {/* Quick Links */}
       <div className="footer-section">
         <h4>Shop</h4>
         <ul>
-          <li><a href="/dresses">All Dresses</a></li>
-          <li><a href="/new-arrivals">New Arrivals</a></li>
-          <li><a href="/bestsellers">Bestsellers</a></li>
-          <li><a href="/wedding">Wedding Dresses</a></li>
-          <li><a href="/cocktail">Cocktail Dresses</a></li>
-          <li><a href="/summer">Summer Collection</a></li>
+          <li><Link to="/dresses">All Dresses</Link></li>
+          <li><Link to="/new-arrivals">New Arrivals</Link></li>
+          <li><Link to="/bestsellers">Bestsellers</Link></li>
+          <li><Link to="/wedding">Wedding Dresses</Link></li>
+          <li><Link to="/cocktail">Cocktail Dresses</Link></li>
+          <li><Link to="/summer">Summer Collection</Link></li>
         </ul>
       </div>
-      
       {/* Customer Service */}
       <div className="footer-section">
         <h4>Customer Service</h4>
         <ul>
-          <li><a href="/contact">Contact Us</a></li>
-          <li><a href="/faq">FAQ</a></li>
-          <li><a href="/shipping">Shipping & Delivery</a></li>
-          <li><a href="/returns">Returns & Exchanges</a></li>
-          <li><a href="/size-guide">Size Guide</a></li>
-          <li><a href="/track-order">Track Order</a></li>
+          <li><Link to="/contact">Contact Us</Link></li>
+          <li><Link to="/faq">FAQ</Link></li>
+          <li><Link to="/shipping">Shipping & Delivery</Link></li>
+          <li><Link to="/returns">Returns & Exchanges</Link></li>
+          <li><Link to="/size-guide">Size Guide</Link></li>
+          <li><Link to="/track-order">Track Order</Link></li>
         </ul>
       </div>
-      
       {/* Newsletter */}
       <div className="footer-section">
         <h4>Stay Updated</h4>
@@ -136,13 +161,12 @@ useEffect(()=>{
         </div>
       </div>
     </div>
-    
     {/* Secondary Footer */}
     <div className="footer-secondary">
       <div className="footer-links">
-        <a href="/privacy">Privacy Policy</a>
-        <a href="/terms">Terms of Service</a>
-        <a href="/cookies">Cookie Policy</a>
+        <Link to="/privacy">Privacy Policy</Link>
+        <Link to="/terms">Terms of Service</Link>
+        <Link to="/cookies">Cookie Policy</Link>
       </div>
       <div className="copyright">
         <p>© 2025 Fashion Boutique. All rights reserved.</p>
